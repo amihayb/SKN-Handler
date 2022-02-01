@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+
+  <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+    <p>Drag one or more files to this Drop Zone ...</p>
+  </div>
+
+  <style>
+    #drop_zone {
+      border: 5px solid blue;
+      width: 200px;
+      height: 100px;
+    }
+  </style>
+
+  <script>
+    function dropHandler(ev) {
+      console.log('File(s) dropped');
+
+      // Prevent default behavior (Prevent file from being opened)
+      ev.preventDefault();
+
+      if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+          // If dropped items aren't files, reject them
+          if (ev.dataTransfer.items[i].kind === 'file') {
+            var file = ev.dataTransfer.items[i].getAsFile();
+            console.log('... file[' + i + '].name = ' + file.name);
+            sknHandle(file);
+          }
+        }
+      } else {
+        // Use DataTransfer interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+          console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+        }
+      }
+    }
+
+    function dragOverHandler(ev) {
+      //console.log('File(s) in drop zone');
+
+      // Prevent default behavior (Prevent file from being opened)
+      ev.preventDefault();
+    }
+
+
+    function sknHandle(file) {
+      var reader = new FileReader();
+      reader.onload = function (progressEvent) {
+        // Entire file
+        console.log(this.result);
+
+        // By lines
+        var lines = this.result.split('\n');
+        for (var line = 0; line < lines.length; line++) {
+          console.log(lines[line]);
+        }
+
+        //var rows = defineObj(['seif','desc','unit','camut','price']);
+        var rows = defineObj(['סעיף', 'תיאור', 'יחידה', 'כמות', 'מחיר', 'סה"כ']);
+
+        lines.forEach(line => {
+          if (line.length < 5) { return; }
+          if (!isNaN(line.slice(0, 2))) {   // Does not start with a number
+
+          }
+
+          var mivne = line.slice(0, 2);
+          var perek = line.slice(2, 4);
+          var subperek = line.slice(4, 6);
+          var seif = line.slice(6, 10);
+          var unit = line.slice(10, 12);
+          var camut = line.slice(12, 21);
+          var price = line.slice(21, 33);
+          var description = line.slice(33);
+          /*rows['seif'].push(seif);
+          rows['desc'].push(description);
+          rows['unit'].push(unit);
+          rows['camut'].push(camut);
+          rows['price'].push(price);*/
+          rows['סעיף'].push(perek + '.' + subperek + '.' + seif);
+          rows['תיאור'].push('"' + description + '"');
+          rows['יחידה'].push(parseUnit(unit));
+          rows['כמות'].push(camut);
+          rows['מחיר'].push(price);
+          rows['סה"כ'].push(multStr(price, camut));
+        });
+        //rows = parseLines(lines);
+
+        exportToCsv('download.csv', rows);
+      };
+      reader.readAsText(file, 'Windows-1255');
+    };
+
+    function parseUnit(unit) {
+      let unitStr = '';
+      switch (unit) {
+        case '00':
+          unitStr = 'הערה';
+          break;
+        case '01':
+          unitStr = 'יח';
+          break;
+        case '02':
+          unitStr = 'מ"א';
+          break;
+        case '03':
+          unitStr = 'מ"ר';
+          break;
+        case '04':
+          unitStr = 'מ"ק';
+          break;
+        case '05':
+          unitStr = 'טון';
+          break;
+        case '06':
+          unitStr = 'נק';
+          break;
+        case '07':
+          unitStr = 'י"ע';
+          break;
+        case '08':
+          unitStr = 'ש"ע';
+          break;
+        case '09':
+          unitStr = 'קומפ';
+          break;
+        case '10':
+          unitStr = 'פאושל';
+          break;
+        case '11':
+          unitStr = 'ק"ג';
+          break;
+        case '12':
+          unitStr = 'ליטר';
+          break;
+        case '13':
+          unitStr = 'דונם';
+          break;
+      }
+      return unitStr;
+    }
+
+    function defineObj(header) {
+
+      var obj = {};
+      for (var i = 0; i < header.length; i++) {
+        obj[header[i]] = [];
+      };
+      return obj;
+    };
+
+    function export2csv() {
+
+      exportToCsv('download.csv', rows);
+    }
+
+    function exportToCsv(filename, rows) {
+
+      var processRow = function (row) {
+        var finalVal = '';
+        for (var j = 0; j < row.length; j++) {
+          var result = processVal(row[j])
+          if (j > 0)
+            finalVal += ',';
+          finalVal += result;
+        }
+        return finalVal + '\n';
+      };
+
+      var csvFile = '';
+      // for (var i = 0; i < rows.length; i++) {
+      //     csvFile += processRow(rows[i]););
+      // }
+      let fields = Object.keys(rows);
+
+      csvFile += processRow(Object.keys(rows));
+      //Object.keys(rows).forEach(field => csvFile += processRow(rows[field]));
+      for (var j = 0; j < rows[fields[0]].length; j++) {
+        csvFile += column2row(rows, j);
+      }
+
+      var blob = new Blob([csvFile], { type: 'text/csv;charset=Windows-1255;' });
+      //var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8,%EF%BB%BF' });
+      if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+          // Browsers that support HTML5 download attribute
+          var url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+
+      function column2row(row, j) {
+        let finalVal = '';
+        Object.keys(rows).forEach(field => finalVal += processVal(row[field][j]) + ',');
+        finalVal = finalVal.slice(0, -1);
+        return finalVal + '\n';
+      }
+
+      function processVal(val) {
+        var innerValue = val === null ? '' : val.toString();
+        if (val instanceof Date) {
+          innerValue = val.toLocaleString();
+        };
+        var result = innerValue.replace(/"/g, '""');
+        if (result.search(/("|,|\n)/g) >= 0)
+          result = '"' + result + '"';
+        return result;
+      }
+    }
+
+    let multStr = (a, b) => (parseFloat(a) * parseFloat(b)).toString();
+
+  </script>
+</body>
+
+</html>
