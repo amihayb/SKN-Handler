@@ -2,19 +2,37 @@
 <html>
 <head>
   <script src="xls-export.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="icon" href="images/SKN-handler.ico" />
 </head>
 
 <body>
+  <div class="flex-container">
   <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-    <p>Drag one or more SKN files to this Drop Zone ...</p>
+    <p>
+    <i class="fab fa-stripe-s fa-5x"></i>
+    <i class="fa fa-angle-double-right fa-4x"></i>
+    <i class="far fa-file-excel fa-5x"></i>
+    <br><br>
+    Drag one or more SKN files to this Drop Zone ...</p>
   </div>
-
+</div>
   <style>
     #drop_zone {
-      border: 5px solid blue;
-      width: 200px;
-      height: 100px;
+      display: flex;
+      border: 4px solid blue;
+      width: 320px;
+      text-align: center;
+      vertical-align: middle;
+      padding:20px;
+      margin-right: 20px;
     }
+    .flex-container {
+    display: flex;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
   </style>
 
   <script>
