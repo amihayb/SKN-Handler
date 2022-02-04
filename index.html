@@ -51,16 +51,19 @@
 
 
     function sknHandle(file) {
+      var txt = 'aaa';
       var reader = new FileReader();
       reader.onload = function (progressEvent) {
+        
+        console.log(file.name);
         // Entire file
-        console.log(this.result);
+        //console.log(this.result);
 
         // By lines
         var lines = this.result.split('\n');
-        for (var line = 0; line < lines.length; line++) {
+        /*for (var line = 0; line < lines.length; line++) {
           console.log(lines[line]);
-        }
+        }*/
         var rows = [];
         //var rows = defineObj(['seif','desc','unit','camut','price']);
         //var rows = defineObj(['סעיף', 'תיאור', 'יחידה', 'כמות', 'מחיר', 'סה"כ']);
@@ -106,7 +109,7 @@
 
         //exportToCsv('download.csv', rows);
         const xls = new XlsExport(rows, 'title');
-        xls.exportToXLS('export.xls')
+        xls.exportToXLS(file.name.slice(0,-4) + '.xls')
       };
       reader.readAsText(file, 'Windows-1255');
     };
