@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
+  <script src="xls-export.js"></script>
 </head>
 
 <body>
-
   <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-    <p>Drag one or more files to this Drop Zone ...</p>
+    <p>Drag one or more SKN files to this Drop Zone ...</p>
   </div>
 
   <style>
@@ -63,9 +61,9 @@
         for (var line = 0; line < lines.length; line++) {
           console.log(lines[line]);
         }
-
+        var rows = [];
         //var rows = defineObj(['seif','desc','unit','camut','price']);
-        var rows = defineObj(['סעיף', 'תיאור', 'יחידה', 'כמות', 'מחיר', 'סה"כ']);
+        //var rows = defineObj(['סעיף', 'תיאור', 'יחידה', 'כמות', 'מחיר', 'סה"כ']);
 
         lines.forEach(line => {
           if (line.length < 5) { return; }
@@ -81,21 +79,34 @@
           var camut = line.slice(12, 21);
           var price = line.slice(21, 33);
           var description = line.slice(33);
+
+          seif = seif.charAt(0)=='0' ? seif.slice(1) : seif;
+
           /*rows['seif'].push(seif);
           rows['desc'].push(description);
           rows['unit'].push(unit);
           rows['camut'].push(camut);
           rows['price'].push(price);*/
-          rows['סעיף'].push(perek + '.' + subperek + '.' + seif);
+          //rows.push({'seif':seif,'desc':description,'unit':unit,'camut':camut,'price':price});
+          /*rows['סעיף'].push(perek + '.' + subperek + '.' + seif);
           rows['תיאור'].push('"' + description + '"');
           rows['יחידה'].push(parseUnit(unit));
           rows['כמות'].push(camut);
           rows['מחיר'].push(price);
-          rows['סה"כ'].push(multStr(price, camut));
+          rows['סה"כ'].push(multStr(price, camut));*/
+          rows.push({'סעיף':perek + '.' + subperek + '.' + seif,
+            'תיאור':'"' + description + '"',
+            'יחידה':parseUnit(unit),
+            'כמות':camut,
+            'מחיר':price,
+          'סה"כ':multStr(price, camut)});
+
         });
         //rows = parseLines(lines);
 
-        exportToCsv('download.csv', rows);
+        //exportToCsv('download.csv', rows);
+        const xls = new XlsExport(rows, 'title');
+        xls.exportToXLS('export.xls')
       };
       reader.readAsText(file, 'Windows-1255');
     };
@@ -225,7 +236,7 @@
       }
     }
 
-    let multStr = (a, b) => (parseFloat(a) * parseFloat(b)).toString();
+    let multStr = (a, b) => (parseFloat(a) * parseFloat(b)).toString().replace('NaN', '');
 
   </script>
 </body>
