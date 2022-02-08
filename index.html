@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8DRPVM22BW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8DRPVM22BW');
+</script>
+
   <script src="xls-export.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="icon" href="images/SKN-handler.ico" />
@@ -15,6 +25,14 @@
     <i class="far fa-file-excel fa-5x"></i>
     <br><br>
     Drag one or more SKN files to this Drop Zone ...</p>
+  </div>
+  <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+    <p>
+      <i class="far fa-file-excel fa-5x"></i>
+    <i class="fa fa-angle-double-right fa-4x"></i>
+    <i class="fab fa-stripe-s fa-5x"></i>
+    <br><br>
+    Drag one or more Excel files to this Drop Zone ...</p>
   </div>
 </div>
   <style>
@@ -101,6 +119,15 @@
           var price = line.slice(21, 33);
           var description = line.slice(33);
 
+          if (isNaN(price)) { // Old format
+            var subperek = line.slice(4, 5);
+            var seif = line.slice(5, 8);
+            var unit = line.slice(8, 10);
+            var camut = line.slice(10, 19);
+            var price = line.slice(19, 31);
+            var description = line.slice(31);
+          }
+
           seif = seif.charAt(0)=='0' ? seif.slice(1) : seif;
 
           /*rows['seif'].push(seif);
@@ -116,7 +143,7 @@
           rows['מחיר'].push(price);
           rows['סה"כ'].push(multStr(price, camut));*/
           rows.push({'סעיף':perek + '.' + subperek + '.' + seif,
-            'תיאור':'"' + description + '"',
+          'תיאור': description,   //'תיאור':'"' + description + '"',
             'יחידה':parseUnit(unit),
             'כמות':camut,
             'מחיר':price,
