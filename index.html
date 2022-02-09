@@ -97,8 +97,8 @@
         //var rows = defineObj(['סעיף', 'תיאור', 'יחידה', 'כמות', 'מחיר', 'סה"כ']);
 
         lines.forEach(line => {
-          if (line.length < 5) { return; }
-          if (isNaN(line.slice(0, 2))) {   // Does not start with a number
+          if (line.length < 3) { return; }
+          if (line.slice(0, 2) == '  ') {   // Does not start with a number
             rows[rows.length-1].תיאור += line.trim();
             return;
           }
@@ -136,7 +136,14 @@
           rows['כמות'].push(camut);
           rows['מחיר'].push(price);
           rows['סה"כ'].push(multStr(price, camut));*/
-          rows.push({'סעיף':perek + '.' + subperek + '.' + seif,
+          
+          let seifStr = '';
+          //if (parseFloat(mivne)==0){
+          //  seifStr = perek + '.' + subperek + '.' + seif;
+          //} else {
+            seifStr = mivne + '.' + perek + '.' + subperek + '.' + seif;
+          //}
+          rows.push({'סעיף':seifStr,
           'תיאור': description,   //'תיאור':'"' + description + '"',
             'יחידה':parseUnit(unit),
             'כמות':camut,
