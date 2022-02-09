@@ -26,6 +26,14 @@
     <br><br>
     Drag one or more SKN files to this Drop Zone ...</p>
   </div>
+  <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+    <p>
+      <i class="far fa-file-excel fa-5x"></i>
+    <i class="fa fa-angle-double-right fa-4x"></i>
+    <i class="fab fa-stripe-s fa-5x"></i>
+    <br><br>
+    Drag one or more Excel files to this Drop Zone ...</p>
+  </div>
 </div>
   <style>
     #drop_zone {
@@ -106,6 +114,7 @@
           var perek = line.slice(2, 4);
           var subperek = line.slice(4, 6);
           var seif = line.slice(6, 10);
+          seif = seif.charAt(0)=='0' ? seif.slice(1) : seif;
           var unit = line.slice(10, 12);
           var camut = line.slice(12, 21);
           var price = line.slice(21, 33);
@@ -120,7 +129,7 @@
             var description = line.slice(31);
           }
 
-          seif = seif.charAt(0)=='0' ? seif.slice(1) : seif;
+          
 
           /*rows['seif'].push(seif);
           rows['desc'].push(description);
